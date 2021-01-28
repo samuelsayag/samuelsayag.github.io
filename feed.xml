@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="htps://samuelsayag.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="htps://samuelsayag.github.io/" rel="alternate" type="text/html" /><updated>2021-01-28T08:48:07+02:00</updated><id>htps://samuelsayag.github.io/feed.xml</id><title type="html">Glob Attack</title><subtitle>Practical Computer stuff. Reading. Thoughts...</subtitle><author><name>Samuel SAYAG</name><email>globattack@gmail.com</email></author><entry><title type="html">Bash Notes - Part 1</title><link href="htps://samuelsayag.github.io/bash/notes/1" rel="alternate" type="text/html" title="Bash Notes - Part 1" /><published>2021-01-28T00:00:00+02:00</published><updated>2021-01-28T00:00:00+02:00</updated><id>htps://samuelsayag.github.io/bash/notes/bash-notes-1</id><content type="html" xml:base="htps://samuelsayag.github.io/bash/notes/1">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;Not so long ago, I decided I needed to learn Bash more seriously. I already coded a bit in Bash, but all my knowledge was made of meaning inferrence from code in various blogs and StackOverflow etc.&lt;/p&gt;
+
+&lt;p&gt;While this is a perfect way to learn when you want practical (fast) results, you end-up gropping around a bit too much when you want to make something new without mentioning not having a single idea of certain feature being available that could save your life :)&lt;/p&gt;
+
+&lt;p&gt;This post is &lt;strong&gt;NOT&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;A tutorial (but could be &lt;em&gt;maybe&lt;/em&gt; used as one)&lt;/li&gt;
+  &lt;li&gt;A complete reference of the Bash scripting language. &lt;a href=&quot;https://tldp.org/guides.html&quot;&gt;This is one&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;A quick unexplicative post about a single feature of the language…there is more than enough&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;These are simply my note of the excellente course of &lt;a href=&quot;https://www.sandervanvugt.com/course/bash-scripting-fundamentals-livelessons/&quot;&gt;Sander Van Vugt&lt;/a&gt; that I want to keep organised and maybe useful to others.&lt;/p&gt;
+
+&lt;p&gt;Like every course notes, one makes the maximum of it when it already have some knowledge (even scattered) and have to organise them, review a technical point, grab some useful tips and know-how.&lt;/p&gt;
+
+&lt;p&gt;Eventually, this is the first post (Part I) but there will be more as I continue to learn.&lt;/p&gt;
+
+&lt;p&gt;Hope it will serve you well! :)&lt;/p&gt;
+
+&lt;h2 id=&quot;getting-help-out-of--man-bash&quot;&gt;Getting Help (out of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$ man bash&lt;/code&gt;)&lt;/h2&gt;
+
+&lt;p&gt;When you name a script beware that:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;You have to put it on your &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$PATH&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;When name conflicts occurs (because the name of the script is an executable already existing in your system), this precedence is applied:
+    &lt;ul&gt;
+      &lt;li&gt;internal command&lt;/li&gt;
+      &lt;li&gt;external command&lt;/li&gt;
+      &lt;li&gt;your scipt&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Internal commands which existence can be tested with:&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;type&lt;/span&gt; &amp;lt;name-of-command&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;External commands which existence can be tested with:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;which &amp;lt;name-of-command&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Get the list of the list of internal commands and optionally get some help about a specific command.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;help&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;command &lt;/span&gt;name]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The authoritative doc is: &lt;a href=&quot;https://tldp.org/guides.html&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;variable-and-parameters&quot;&gt;Variable and parameters&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Don’t forget the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;shebang&lt;/code&gt;: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;#!/bin/bash&lt;/code&gt;. It gives the bash the language of the script in order to find the correct interpreter.&lt;/li&gt;
+  &lt;li&gt;Put some comment explaining the purpose of the script&lt;/li&gt;
+  &lt;li&gt;Put some usage information&lt;/li&gt;
+  &lt;li&gt;Put &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;exit 0&lt;/code&gt; at the end of the script.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The last executed command exit status can be access with the variable: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$?&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;variables&quot;&gt;Variables&lt;/h3&gt;
+
+&lt;p&gt;You can define them:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;statically: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MY_VAR=foo&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;export MY_VAR=foo&lt;/code&gt; (if you want any sub-shell to access it),&lt;/li&gt;
+  &lt;li&gt;or as arguments of the script $0, $1, $2…&lt;/li&gt;
+  &lt;li&gt;or interactively with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;read&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Variable are accessed with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$&lt;/code&gt;. For instance: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$MY_VAR&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;script-execution-shellsub-shell&quot;&gt;Script execution (shell/sub-shell)&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;A script (when lauched for instance by: ./my-script) is going to be executed in a &lt;em&gt;sub-shell&lt;/em&gt;. Before the execution 2 script are going to be executed: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/etc/bash.bashrc&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;~/.bashrc&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;If it is a &lt;em&gt;login-shell&lt;/em&gt; 2 other file are executed first: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/etc/profile&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;~/.profile&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;Good explanation about shell and sub-shell: &lt;a href=&quot;https://askubuntu.com/questions/155865/what-are-login-and-non-login-shells&quot;&gt;here&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;sourcing-other-scripts&quot;&gt;Sourcing other scripts&lt;/h3&gt;
+
+&lt;p&gt;Inside your script put:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt; /path/of/the/sourced/script
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;alternatively&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;source&lt;/span&gt; /path/of/the/sourced/script
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;The main idea for a system script (even a small one), is to have &lt;strong&gt;static code&lt;/strong&gt; in the &lt;em&gt;sourced file&lt;/em&gt; and the &lt;strong&gt;dynamic code&lt;/strong&gt; in the &lt;em&gt;called script&lt;/em&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;strong&gt;!!! Danger !!!&lt;/strong&gt; don’t put &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;exit codes&lt;/code&gt; in a &lt;em&gt;sourced script&lt;/em&gt; (if you source it in your &lt;em&gt;current shell&lt;/em&gt; then the exit would close your working shell)&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;quoting&quot;&gt;Quoting&lt;/h3&gt;
+
+&lt;p&gt;Reserved character (that need &lt;em&gt;quoting&lt;/em&gt;):&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;Character&lt;/th&gt;
+      &lt;th&gt;Meaning&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;Character&lt;/th&gt;
+      &lt;th&gt;Meaning&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;~&lt;/td&gt;
+      &lt;td&gt;home dir&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;]&lt;/td&gt;
+      &lt;td&gt;end char set wildcard&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;`&lt;/td&gt;
+      &lt;td&gt;command substitution&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;{&lt;/td&gt;
+      &lt;td&gt;start code block&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;#&lt;/td&gt;
+      &lt;td&gt;comment&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;}&lt;/td&gt;
+      &lt;td&gt;end code block&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;$&lt;/td&gt;
+      &lt;td&gt;variable expansion&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;;&lt;/td&gt;
+      &lt;td&gt;command separator&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;&amp;amp;&lt;/td&gt;
+      &lt;td&gt;background job&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;’&lt;/td&gt;
+      &lt;td&gt;strong quote&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;*&lt;/td&gt;
+      &lt;td&gt;wildcard string&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;”&lt;/td&gt;
+      &lt;td&gt;weak quote&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;(&lt;/td&gt;
+      &lt;td&gt;start sub-shell&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;&amp;lt;&lt;/td&gt;
+      &lt;td&gt;input redirection&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;)&lt;/td&gt;
+      &lt;td&gt;end sub-shell&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;&amp;gt;&lt;/td&gt;
+      &lt;td&gt;output redirection&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;\&lt;/td&gt;
+      &lt;td&gt;escape&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;/&lt;/td&gt;
+      &lt;td&gt;path separator&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;|&lt;/td&gt;
+      &lt;td&gt;pipe&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;?&lt;/td&gt;
+      &lt;td&gt;single char wildcard&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;[&lt;/td&gt;
+      &lt;td&gt;start char set wildcard&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt; &lt;/td&gt;
+      &lt;td&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;“hard” quote are &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;'&lt;/code&gt; and nothing is interpreted in it&lt;/li&gt;
+  &lt;li&gt;“weak” quote are &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&quot;&lt;/code&gt; and &lt;em&gt;variable&lt;/em&gt;, &lt;em&gt;command substitution&lt;/em&gt; and _ &lt;em&gt;arithmetic expression&lt;/em&gt; are interpreted in it&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;handling-script-arguments&quot;&gt;Handling script arguments&lt;/h3&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;Variable&lt;/th&gt;
+      &lt;th&gt;Meaning&lt;/th&gt;
+      &lt;th&gt;Variable&lt;/th&gt;
+      &lt;th&gt;Meaning&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;$0&lt;/td&gt;
+      &lt;td&gt;absolute path of the script&lt;/td&gt;
+      &lt;td&gt;$*&lt;/td&gt;
+      &lt;td&gt;string of all arguments&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;$1&lt;/td&gt;
+      &lt;td&gt;first argument ($1…9 possible)&lt;/td&gt;
+      &lt;td&gt;$#&lt;/td&gt;
+      &lt;td&gt;number of arguments&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;$9&lt;/td&gt;
+      &lt;td&gt;last argument accessible with $n&lt;/td&gt;
+      &lt;td&gt;$@&lt;/td&gt;
+      &lt;td&gt;array of all arguments&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;more arg&lt;/td&gt;
+      &lt;td&gt;use ${} (not compatible with all shells) or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;shift&lt;/code&gt;&lt;/td&gt;
+      &lt;td&gt; &lt;/td&gt;
+      &lt;td&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;most of the time for number of arg &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;(n &amp;gt; 9)&lt;/code&gt; use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;${n}&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;shift&lt;/code&gt; is the only really compatible command no matter the shell.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;command-substitution&quot;&gt;Command substitution&lt;/h3&gt;
+
+&lt;p&gt;Command substitution allows the output of a command to replace the command itself.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;deprecated: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;`&amp;lt;my-command`&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;recommended: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$(&amp;lt;my-command&amp;gt;)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;test-string&quot;&gt;Test string&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;test -z $1 &amp;amp;&amp;amp; exit 1&lt;/code&gt; (is checking for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$1&lt;/code&gt; to be empty and exit if it is the case&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[[ $1=='[a-z]*' ]] || echo $1 does not start with a letter&lt;/code&gt; (check if the variable $1 respect the given pattern and echo a message if not)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Note: &lt;strong&gt;!!Warning!!&lt;/strong&gt; put no space afer the variable name &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[[ $1 == pattern ]]&lt;/code&gt; is wrong because the shell would search for a variable called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$1 &lt;/code&gt; instead of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$1&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;here-document&quot;&gt;Here document&lt;/h3&gt;
+
+&lt;p&gt;Useful when you want to send many arguments to the same commands such as &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;echo&lt;/code&gt; or commands that require interactive interaction such as &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;lftp&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+hello
+print this
+print that
+bye
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;more interesting&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;lftp &amp;lt;&lt;span class=&quot;nb&quot;&gt;hostname&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EndOfSession&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+ls
+get &amp;lt;file/path&amp;gt;
+bye
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EndOfSession
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;tips&quot;&gt;Tips&lt;/h2&gt;
+
+&lt;h3 id=&quot;empty-a-file-completly-without-erasing-it&quot;&gt;Empty a file completly without erasing it&lt;/h3&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; /dev/nul &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; the-file-to-be-emptied
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;debug-a-script-to-see-where-it-f-up&quot;&gt;Debug a script to see where it F#*$@&amp;amp;!-up&lt;/h3&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;bash &lt;span class=&quot;nt&quot;&gt;-x&lt;/span&gt; &amp;lt;my-script&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;read-an-array-of-variable&quot;&gt;Read an array of variable&lt;/h3&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; &amp;lt;my-array-var&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;best-practice&quot;&gt;Best practice&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Use upper case just for variable names inside scripts&lt;/li&gt;
+  &lt;li&gt;Separate &lt;em&gt;static&lt;/em&gt; from &lt;em&gt;dynamic&lt;/em&gt; code in scripts so that the &lt;em&gt;static&lt;/em&gt; part can be portable.&lt;/li&gt;
+  &lt;li&gt;Always use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;'&lt;/code&gt; until you need &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&quot;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Samuel SAYAG</name><email>globattack@gmail.com</email></author><summary type="html">Introduction</summary></entry></feed>
