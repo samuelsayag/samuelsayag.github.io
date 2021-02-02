@@ -1,8 +1,219 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="htps://samuelsayag.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="htps://samuelsayag.github.io/" rel="alternate" type="text/html" /><updated>2021-01-28T10:12:04+02:00</updated><id>htps://samuelsayag.github.io/feed.xml</id><title type="html">Glob Attack</title><subtitle>Practical Computer stuff. Reading. Thoughts...</subtitle><author><name>Samuel SAYAG</name><email>globattack@gmail.com</email></author><entry><title type="html">Bash Notes - Part 1</title><link href="htps://samuelsayag.github.io/bash/notes/1" rel="alternate" type="text/html" title="Bash Notes - Part 1" /><published>2021-01-28T00:00:00+02:00</published><updated>2021-01-28T00:00:00+02:00</updated><id>htps://samuelsayag.github.io/bash/notes/bash-notes-1</id><content type="html" xml:base="htps://samuelsayag.github.io/bash/notes/1">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="htps://samuelsayag.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="htps://samuelsayag.github.io/" rel="alternate" type="text/html" /><updated>2021-02-02T12:09:01+02:00</updated><id>htps://samuelsayag.github.io/feed.xml</id><title type="html">Glob Attack</title><subtitle>Practical Computer stuff. Reading. Thoughts...</subtitle><author><name>Samuel SAYAG</name><email>globattack@gmail.com</email></author><entry><title type="html">Bash Notes - Part 2</title><link href="htps://samuelsayag.github.io/bash/notes/2" rel="alternate" type="text/html" title="Bash Notes - Part 2" /><published>2021-02-02T00:00:00+02:00</published><updated>2021-02-02T00:00:00+02:00</updated><id>htps://samuelsayag.github.io/bash/notes/bash-notes-2</id><content type="html" xml:base="htps://samuelsayag.github.io/bash/notes/2">&lt;h1 id=&quot;bash-notes-part-2---transforming-the-input&quot;&gt;Bash Notes (Part 2) - Transforming the input&lt;/h1&gt;
 
-&lt;p&gt;Not so long ago, I decided I needed to learn Bash more seriously. I already coded a bit in Bash, but all my knowledge was made of meaning inferrence from code in various blogs and StackOverflow etc.&lt;/p&gt;
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
-&lt;p&gt;While this is a perfect way to learn when you want practical (fast) results, you end-up gropping around a bit too much when you want to make something new without mentioning not having a single idea of certain feature being available that could save your life :)&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&quot;/bash/notes/1&quot;&gt;first part&lt;/a&gt;, I introduced the reader to the basic of writing scripts (shebang, comments, parameters, variable and quoting…).&lt;/p&gt;
+
+&lt;p&gt;This second part focuses on &lt;em&gt;processing input parameter or variables&lt;/em&gt; of a script: checking parameters, providing default, extracting part via pattern/regexp and calculating.&lt;/p&gt;
+
+&lt;p&gt;The main keywords are:  &lt;strong&gt;variable expansion&lt;/strong&gt;, &lt;strong&gt;parameter expansion&lt;/strong&gt;, &lt;strong&gt;pattern matching&lt;/strong&gt;,  &lt;strong&gt;regular expression&lt;/strong&gt; and &lt;strong&gt;arithmetic evaluation&lt;/strong&gt;. 
+Searching &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;man bash&lt;/code&gt; (Internet…) for this will give wider details and explanations.&lt;/p&gt;
+
+&lt;h2 id=&quot;parameter-expansion&quot;&gt;Parameter expansion&lt;/h2&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;substitution operator&lt;/th&gt;
+      &lt;th&gt;meaning&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;${VAR:-value}&lt;/code&gt;&lt;/td&gt;
+      &lt;td&gt;Does not set the variable. Return $VAR if set else return &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;value&lt;/code&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;${VAR:=value}&lt;/code&gt;&lt;/td&gt;
+      &lt;td&gt;Set the variable with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;value&lt;/code&gt; if not set and return $VAR.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;${VAR:?message}&lt;/code&gt;&lt;/td&gt;
+      &lt;td&gt;If $VAR is set show its value else display &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;message&lt;/code&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;${VAR:offset:length}&lt;/code&gt;&lt;/td&gt;
+      &lt;td&gt;If $VAR is set show the $VAR from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;offset&lt;/code&gt; to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;offset + length&lt;/code&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;The last line shows a primitive way of taking a part of the variable without &lt;em&gt;touching&lt;/em&gt; it. 
+A typical example of this is taking a part of a date for instance.&lt;/p&gt;
+
+&lt;h2 id=&quot;pattern-matching--regular-expressions&quot;&gt;Pattern matching &amp;amp; Regular expressions&lt;/h2&gt;
+
+&lt;p&gt;A better way to take some part of a variable (sentence, text, number…) is to use pattern matching.&lt;/p&gt;
+
+&lt;p&gt;Here are the most commonly used &lt;em&gt;parameter expansion&lt;/em&gt; using &lt;em&gt;patterns&lt;/em&gt;.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;substitution operator&lt;/th&gt;
+      &lt;th&gt;meaning&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;${VAR#pattern}&lt;/code&gt;&lt;/td&gt;
+      &lt;td&gt;Trim $VAR from the &lt;em&gt;beginning&lt;/em&gt; to the &lt;em&gt;first&lt;/em&gt; occurence of the pattern (including it) else return the $VAR untouched&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;${VAR##pattern}&lt;/code&gt;&lt;/td&gt;
+      &lt;td&gt;Trim $VAR from the beginning to the &lt;em&gt;last&lt;/em&gt; occurence of the pattern (including it) else return the $VAR untouched&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;${VAR%pattern}&lt;/code&gt;&lt;/td&gt;
+      &lt;td&gt;Trim $VAR from the &lt;em&gt;end&lt;/em&gt; to the &lt;em&gt;first&lt;/em&gt; occurence of the pattern (including it) else return the $VAR untouched&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;${VAR%%pattern}&lt;/code&gt;&lt;/td&gt;
+      &lt;td&gt;Trim $VAR from the &lt;em&gt;end&lt;/em&gt; to the &lt;em&gt;last&lt;/em&gt; occurence of the pattern (including it) else return the $VAR untouched&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;${#VAR}&lt;/code&gt;&lt;/td&gt;
+      &lt;td&gt;Variable length&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Patterns are written in a small language allowing to specify sets of strings. It can be used with a lot of bash builtins commands (see: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;man bash-builtins&lt;/code&gt;).&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;pattern&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;extglob&lt;/th&gt;
+      &lt;th&gt;meaning&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;*&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;no&lt;/td&gt;
+      &lt;td&gt;Match zero or more characters&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;?&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;no&lt;/td&gt;
+      &lt;td&gt;Match any single character&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;[…]&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;no&lt;/td&gt;
+      &lt;td&gt;Match any of the characters in a set&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;[:class:]&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;no&lt;/td&gt;
+      &lt;td&gt;Class of char (POSIX standard): alnum alpha ascii blank cntrl digit graph lower print punct space upper word xdigit&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;?(patterns)&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;yes&lt;/td&gt;
+      &lt;td&gt;Match zero or one occurrences of the patterns (extglob)&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;*(patterns)&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;yes&lt;/td&gt;
+      &lt;td&gt;Match zero or more occurrences of the patterns (extglob)&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;+(patterns)&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;yes&lt;/td&gt;
+      &lt;td&gt;Match one or more occurrences of the patterns (extglob)&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;@(patterns)&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;yes&lt;/td&gt;
+      &lt;td&gt;Match one occurrence of the patterns (extglob)&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;!(patterns)&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;yes&lt;/td&gt;
+      &lt;td&gt;Match anything that doesn’t match one of the patterns (extglob)&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;|&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;yes&lt;/td&gt;
+      &lt;td&gt;logical OR between pattern&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;(this is inspired by the &lt;a href=&quot;https://www.linuxjournal.com/content/pattern-matching-bash&quot;&gt;short but very explainful&lt;/a&gt;)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;extglob&lt;/strong&gt;: Use extending globbing (the pattern language) capabilities. Activation can be checked by &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;shopt extglob&lt;/code&gt;. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;shopt&lt;/code&gt; give you the state of your shell options.&lt;/p&gt;
+
+&lt;p&gt;Beside this, some &lt;em&gt;non&lt;/em&gt; internal commands are very often in use when writing scripts. And at their heart stands the use of &lt;em&gt;Regular Expressions&lt;/em&gt;(RegExp) which is a &lt;em&gt;much more&lt;/em&gt; extended language to search for pattern in a text.&lt;/p&gt;
+
+&lt;p&gt;For instance:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;grep&lt;/code&gt; (stands for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;g/re/p&lt;/code&gt; or globally regular expression parsing/printing) is the source to understand your system regular expression standards (thers is many according to the tool. &lt;a href=&quot;https://www.gnu.org/software/grep/manual/html_node/Regular-Expressions.html#Regular-Expressions&quot;&gt;Documentation&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sed&lt;/code&gt; &lt;strong&gt;S&lt;/strong&gt;tream &lt;strong&gt;Ed&lt;/strong&gt;itor that make extensive use of RegExp. &lt;a href=&quot;https://www.gnu.org/software/sed/manual/sed.html&quot;&gt;Documentation&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;awk&lt;/code&gt; &lt;strong&gt;A&lt;/strong&gt;ho - &lt;strong&gt;W&lt;/strong&gt;einberg - &lt;strong&gt;K&lt;/strong&gt;ernighan a more involved programming language used for parsing. &lt;a href=&quot;https://www.gnu.org/software/gawk/manual/gawk.html&quot;&gt;Documentation&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Although a big subset of this language is common to all of them, there is now many standards of Regular Expression in use depending on the tool/programming language (see: &lt;a href=&quot;https://www.regular-expressions.info/reference.html&quot;&gt;reference on standards&lt;/a&gt;). So beware to check on the one in used with your tool.&lt;/p&gt;
+
+&lt;h2 id=&quot;calculating&quot;&gt;Calculating&lt;/h2&gt;
+
+&lt;p&gt;These are the practical means to compute from variables:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Arithmetic Evaluation (search it in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;man bash&lt;/code&gt;) is &lt;em&gt;internal&lt;/em&gt;. Arithmetic expression can be evaluated with:&lt;/p&gt;
+
+    &lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$((&amp;lt;arithmetic expression&amp;gt;))&lt;/code&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bc&lt;/code&gt; &lt;strong&gt;B&lt;/strong&gt;asic &lt;strong&gt;C&lt;/strong&gt;alculator is an external command that extend the calculation capabilities (float…). &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bc&lt;/code&gt; can be used for instance:&lt;/p&gt;
+
+    &lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;echo &quot;&amp;lt;bc programm&amp;gt;&quot; | bc&lt;/code&gt;&lt;/p&gt;
+
+    &lt;p&gt;or if directly fill a variable with:&lt;/p&gt;
+
+    &lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VAR=$(echo &quot;&amp;lt;bc programm&amp;gt;&quot; | bc)&lt;/code&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;exercise&quot;&gt;Exercise&lt;/h2&gt;
+
+&lt;p&gt;This script illustrate the use of the knowledge above.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# This script date a format date X-Y-Z and split it.&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# It writes also:&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# The day X, The month Y, The year Z&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Usage: ./splitdate &lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;TODAY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;date&lt;/span&gt; +%d-%m-%y&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;DIG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=[[&lt;/span&gt;:digit:]]
+&lt;span class=&quot;nv&quot;&gt;DIG2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$DIG$DIG&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;DAYMONTH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;TODAY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;%%-&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$DIG2&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;The day is &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;TODAY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;%%-&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$DIG2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$DIG2&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;The month is &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DAYMONTH&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;#&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$DIG2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;The year is &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;TODAY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;##&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$DIG2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$DIG2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Bonus :-)&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# echo &quot;Next year will be $(( ${TODAY##$DIG2-$DIG2-} + 1 ))&quot;&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Samuel SAYAG</name><email>globattack@gmail.com</email></author><category term="pattern" /><category term="matching" /><category term="pattern matching" /><category term="regular" /><category term="expression" /><category term="regular expression" /><category term="parameter expansion" /><category term="variable expansion" /><summary type="html">Bash course notes (Part 2)</summary></entry><entry><title type="html">Bash Notes - Part 1</title><link href="htps://samuelsayag.github.io/bash/notes/1" rel="alternate" type="text/html" title="Bash Notes - Part 1" /><published>2021-01-28T00:00:00+02:00</published><updated>2021-01-28T00:00:00+02:00</updated><id>htps://samuelsayag.github.io/bash/notes/bash-notes-1</id><content type="html" xml:base="htps://samuelsayag.github.io/bash/notes/1">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;Not so long ago, I decided I needed to learn Bash more seriously. I already coded a bit in Bash, but all my knowledge was made of examples inferrence from various code encountered in  blogs and StackOverflow etc.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Why learning bash (as a software developer) and not Python for instance?&lt;/em&gt;
+Well, various reasons:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;There is a huge existing codebase of bash script in the Unix/MacOS/Linux world…and I may have to understand what it does sometimes.&lt;/li&gt;
+  &lt;li&gt;Bash is a &lt;em&gt;lingua franca&lt;/em&gt; meaning that you may have Bash at your disposal without having Python&lt;/li&gt;
+  &lt;li&gt;It is really powerful and OS connected&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;While copying code is a perfect way to learn when you want practical (fast) results, you end-up gropping around a bit too much when you want to make something new without mentioning not having a single idea of certain feature being available that could save your life :)&lt;/p&gt;
 
 &lt;p&gt;This post is &lt;strong&gt;NOT&lt;/strong&gt;:&lt;/p&gt;
 &lt;ul&gt;
@@ -11,9 +222,11 @@
   &lt;li&gt;A quick unexplicative post about a single feature of the language…there is more than enough&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;These are simply my note of the excellente course of &lt;a href=&quot;https://www.sandervanvugt.com/course/bash-scripting-fundamentals-livelessons/&quot;&gt;Sander Van Vugt&lt;/a&gt; that I want to keep organised and maybe useful to others.&lt;/p&gt;
+&lt;p&gt;These are simply my (enriched) notes of the excellente course of &lt;a href=&quot;https://www.sandervanvugt.com/course/bash-scripting-fundamentals-livelessons/&quot;&gt;Sander Van Vugt&lt;/a&gt; that I want to keep organised and maybe useful to others.&lt;/p&gt;
 
-&lt;p&gt;Like every course notes, one makes the maximum of it when it already have some knowledge (even scattered) and have to organise them, review a technical point, grab some useful tips and know-how.&lt;/p&gt;
+&lt;p&gt;Like every course notes, one makes the maximum of it when it already have some knowledge (even scattered) and have to organise them, review a technical point, grab some useful tips and know-how. The advantage here is it is very &lt;em&gt;practical&lt;/em&gt; (by opposition to filled with theoretical details) so it allows both to write script fast and also to &lt;em&gt;read&lt;/em&gt; them (on your own OS).&lt;/p&gt;
+
+&lt;p&gt;Another purpose is to give the actual correct terminology of the part of this language as much as some sub-languages because they are the key for searching for more explanation on the Internet or any other source of documentation. For instance, you may encounter something like &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;${VAR:-somethingElse}&lt;/code&gt; and know that some code is being interpreted inside the curly braces. It will be even faster if you already know that this is called &lt;em&gt;parameter expansion&lt;/em&gt; and that there is plenty of other way to apply this technique (search for this term in the man of bash for instance).&lt;/p&gt;
 
 &lt;p&gt;Eventually, this is the first post (Part I) but there will be more as I continue to learn.&lt;/p&gt;
 
@@ -47,7 +260,12 @@
 &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;help&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;command &lt;/span&gt;name]
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;The authoritative doc is: &lt;a href=&quot;https://tldp.org/guides.html&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The authoritative doc is:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://tldp.org/guides.html&quot;&gt;here&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;man bash&lt;/code&gt; (if you know what you want to search)&lt;/li&gt;
+  &lt;li&gt;also &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;man bash-builtins&lt;/code&gt; is really great as it gives you the &lt;em&gt;internal commands&lt;/em&gt; of bash and the meaning/usage.&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&quot;variable-and-parameters&quot;&gt;Variable and parameters&lt;/h2&gt;
 
@@ -293,4 +511,34 @@ bye
   &lt;li&gt;Use upper case just for variable names inside scripts&lt;/li&gt;
   &lt;li&gt;Separate &lt;em&gt;static&lt;/em&gt; from &lt;em&gt;dynamic&lt;/em&gt; code in scripts so that the &lt;em&gt;static&lt;/em&gt; part can be portable.&lt;/li&gt;
   &lt;li&gt;Always use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;'&lt;/code&gt; until you need &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&quot;&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Samuel SAYAG</name><email>globattack@gmail.com</email></author><summary type="html">Bash course notes (Part 1)</summary></entry></feed>
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;exercise&quot;&gt;Exercise&lt;/h2&gt;
+
+&lt;p&gt;This script illustrate the use of the knowledge above.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# This script take an undefine number of arguments.&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# If the argument is a file it will copy it to /tmp&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# if not argument is provided it read one from the command line&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Usage: ./totmp [arg1 [ arg2 [...]]]&lt;/span&gt;
+
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$# &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; 0 &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# also possible: if [ -z $1 ]; then&lt;/span&gt;
+	&lt;span class=&quot;nb&quot;&gt;read &lt;/span&gt;FILE_NAME_LIST
+&lt;span class=&quot;k&quot;&gt;else
+	&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;FILE_NAME_LIST&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$@&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;fi
+
+for &lt;/span&gt;i &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$FILE_NAME_LIST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;do
+	if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+		&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cp&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$i&lt;/span&gt; /tmp
+		&lt;span class=&quot;nb&quot;&gt;echo &lt;/span&gt;file &lt;span class=&quot;nv&quot;&gt;$i&lt;/span&gt; copied to /tmp
+	&lt;span class=&quot;k&quot;&gt;fi
+done&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Samuel SAYAG</name><email>globattack@gmail.com</email></author><category term="script" /><category term="bash" /><category term="variable" /><category term="execution" /><category term="argument" /><category term="substitution" /><category term="here document" /><category term="read" /><category term="shift" /><summary type="html">Bash course notes (Part 1)</summary></entry></feed>
