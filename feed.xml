@@ -1,4 +1,549 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="htps://samuelsayag.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="htps://samuelsayag.github.io/" rel="alternate" type="text/html" /><updated>2021-02-02T12:09:01+02:00</updated><id>htps://samuelsayag.github.io/feed.xml</id><title type="html">Glob Attack</title><subtitle>Practical Computer stuff. Reading. Thoughts...</subtitle><author><name>Samuel SAYAG</name><email>globattack@gmail.com</email></author><entry><title type="html">Bash Notes - Part 2</title><link href="htps://samuelsayag.github.io/bash/notes/2" rel="alternate" type="text/html" title="Bash Notes - Part 2" /><published>2021-02-02T00:00:00+02:00</published><updated>2021-02-02T00:00:00+02:00</updated><id>htps://samuelsayag.github.io/bash/notes/bash-notes-2</id><content type="html" xml:base="htps://samuelsayag.github.io/bash/notes/2">&lt;h1 id=&quot;bash-notes-part-2---transforming-the-input&quot;&gt;Bash Notes (Part 2) - Transforming the input&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="htps://samuelsayag.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="htps://samuelsayag.github.io/" rel="alternate" type="text/html" /><updated>2021-07-23T09:04:31+03:00</updated><id>htps://samuelsayag.github.io/feed.xml</id><title type="html">Glob Attack</title><subtitle>Practical Computer stuff. Reading. Thoughts...</subtitle><author><name>Samuel SAYAG</name><email>globattack@gmail.com</email></author><entry><title type="html">Variance Distilled</title><link href="htps://samuelsayag.github.io/scala/variance/variance-distilled" rel="alternate" type="text/html" title="Variance Distilled" /><published>2021-07-21T00:00:00+03:00</published><updated>2021-07-21T00:00:00+03:00</updated><id>htps://samuelsayag.github.io/scala/variance/variance-distilled</id><content type="html" xml:base="htps://samuelsayag.github.io/scala/variance/variance-distilled">&lt;h1 id=&quot;scala-variance-distilled&quot;&gt;Scala Variance Distilled&lt;/h1&gt;
+
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;This article could have been called YAASV (“Yet Another Article on Scala Variance”).&lt;/p&gt;
+
+&lt;p&gt;There is already a lot of (good!) resources about variance out there (more about that in the next
+section). So why making another article about it?&lt;/p&gt;
+
+&lt;p&gt;Well, because if reading these resources gives actually a good grasp on the basics such
+as the definition, the technical aspect of it, the mental model (producer/consumer) 
+that one has to build in order to understand it better, I always finished
+my reading without feeling that I could practically use this knowledge. 
+It was still a bit abstract, the kind of academic one that is useful 
+to understand type signature but was not really part of my realm, my toolbox.&lt;/p&gt;
+
+&lt;p&gt;The picture changed recently when I received some really pertinent explanation
+thanks to a workshop on Functional Data Modelling given by &lt;a href=&quot;https://degoes.net/&quot; title=&quot;John de Goes's Blog&quot;&gt;John de Goes&lt;/a&gt;.
+I got some answer about apparently very basic questions: 
+Why is variance implanted in the Scala language? 
+What does it bring to the table? 
+Should it be use with parsimony or wherever possible?
+How does the (type inference) world look without it?
+…and so on.&lt;/p&gt;
+
+&lt;p&gt;By the end, the picture seemed kind of clear so I decided that I should write something about it
+in order to prove to myself that I actually really understood it. 
+But I wanted to cover some gaps I could see in other resources so that it eventually 
+can be a practical thing for others.&lt;/p&gt;
+
+&lt;h2 id=&quot;some-other-good-resource-that-you-would-want-to-try&quot;&gt;Some other good resource that you would want to try…&lt;/h2&gt;
+
+&lt;p&gt;If your patient enough to read whole chapters of books you may want to give a try to these excellent ones:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://learning.oreilly.com/library/view/programming-scala-3rd/9781492077886/&quot; title=&quot;Dean Wampler, Programming Scala 3rd (or 2nd) Ed., Chap. 11&quot;&gt;Martin Odersky, Lex Spoon, and Bill Venners, “Programming in Scala, 4th Ed. (or 2nd or 3rd) Ed., Chap 19”&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.artima.com/shop/programming_in_scala_4ed&quot; title=&quot;Programming in Scala, 4th Ed. (or 2nd or 3rd) Ed., Chap 19&quot;&gt;“Dean Wampler, Programming Scala 3rd (or 2nd) Ed., Chap. 11”&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If you just want to read a few introductions on it you certainly would enjoys these also:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://apiumhub.com/tech-blog-barcelona/scala-generics-covariance-contravariance/&quot; title=&quot;Scala Generics II, Variance&quot;&gt;Scala Generics II&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://blog.knoldus.com/covariance-and-contravariance-in-scala/&quot; title=&quot;Covariance &amp;amp; Contravariance in Scala&quot;&gt;Covariance &amp;amp; Contravariance in Scala&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://dev.to/vitornovictor/contravariance-in-the-real-world-29l&quot; title=&quot;Contravariance in the real World&quot;&gt;Contravariance in the Real World&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://lansalo.com/2017/10/22/scala-variance-explained/&quot; title=&quot;Scala Variance explained&quot;&gt;Scala Variance explained&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;…or read what follows of course.&lt;/p&gt;
+
+&lt;h2 id=&quot;organisation&quot;&gt;Organisation&lt;/h2&gt;
+
+&lt;p&gt;I think that a practical understanding of variance have to include an answer to the following questions:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;What&lt;/strong&gt; is it? &lt;em&gt;Meaning&lt;/em&gt;: What is the definition 
+and can we dissect every &lt;em&gt;hard&lt;/em&gt; concept of it so that every part is clear?&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;How&lt;/strong&gt; is it implemented in Scala? &lt;em&gt;Meaning&lt;/em&gt;: how does it appear in Scala code or how to use it?&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Why&lt;/strong&gt; is there variance? &lt;em&gt;Meaning&lt;/em&gt;: what does it brings to the table for us?
+(and how much does we have to pay for it in terms of constraint?)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;what-is-variance&quot;&gt;What is variance?&lt;/h2&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Variance is given to parameter(s) of type constructors. 
+It is an assertion made to the Scala compiler that, 
+given an existing subtyping relationship between concrete types,
+&lt;em&gt;we want it to enforce&lt;/em&gt; a subtyping relationship between
+type constructors that were built with these types.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Yeah, I know. A mouthful. But, actually, every bits of this definition is important. So let’s break it.&lt;/p&gt;
+
+&lt;p&gt;First of all we need a &lt;em&gt;subtyping relationship between concrete types&lt;/em&gt;. What is it? This:&lt;/p&gt;
+
+&lt;p&gt;&lt;a name=&quot;concrete_type_hierarchy&quot;&gt; A concrete type hierarchy:&lt;/a&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// I have this hierarchy of types&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//             A&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//            ↗ ↖&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//           B   C&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;A&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; 
+&lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;C&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; 
+
+&lt;span class=&quot;c1&quot;&gt;// what is (one of) the power behind it? This!&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// A is an A, B is an A and, C is an A&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;a1&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;{}&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;a2&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;{}&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;a3&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;{}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;During the article I will refer to this hierarchy again and again without always display it again&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;On the other side we have &lt;em&gt;type constructors&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;They are also types but not concrete ones (they are called &lt;em&gt;higher kinded types&lt;/em&gt;).&lt;/p&gt;
+
+&lt;p&gt;As their name (&lt;em&gt;type constructors&lt;/em&gt;) suggest, a concrete type can be built from them. 
+In practice, you feed a type constructor one (or more..) concrete types and you receive a concrete type.&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// this is a type constructor&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// by the way T is called a &quot;type parameter&quot; and you can have many of them.&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// Container[T] can also be called a &quot;parametric type&quot; because...it has a type parameter :)&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// Because parametriciy is also called genericity in Java, they are also call generic types.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; 
+
+&lt;span class=&quot;c1&quot;&gt;// or other more commons&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// I omitter the variance because I still haven't introduced it!&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Option&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; 
+&lt;span class=&quot;nc&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Either&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;A&lt;/span&gt;,&lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Future&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;nc&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ZIO&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;R&lt;/span&gt;,&lt;span class=&quot;kt&quot;&gt;E&lt;/span&gt;,&lt;span class=&quot;kt&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// building a concrete type out of it&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;ContainerOfInt&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// buiding a value....&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;ContainerOfInt&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]{}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you want a nice and deep intuition you can put it like that: 
+&lt;em&gt;type constructors&lt;/em&gt; are equivalent to functions operating at type level.
+If a function is “give me one (or more) value I will return you another one” (value level),
+the type constructor is “give me one (or more) types I will return you a concrete one” (type level).&lt;/p&gt;
+
+&lt;p&gt;Now, what is crucial to understand is that we get to fix the variance of a type constructor.
+We decide in a complete &lt;em&gt;arbitrary fashion&lt;/em&gt; what will be the subtyping relationship of a 
+given type constructor (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[T]&lt;/code&gt;) that wraps a concrete hierarchy of types.&lt;/p&gt;
+
+&lt;p&gt;Again: YOU have to decide. 
+Of course, it is usually backed by serious design arguments (more later about it), 
+but it stays that it is an arbitrary decision i.e an “assertion you make to the compiler”.&lt;/p&gt;
+
+&lt;p&gt;Of course, once the type is set on a specific variance, the compiler will enforce
+some rules that will constraint our type contructors (its methods…) 
+but also gives us more power in certain case.&lt;/p&gt;
+
+&lt;p&gt;But how do we actually enforce variance…&lt;/p&gt;
+
+&lt;h2 id=&quot;how-do-we-enforce-variance&quot;&gt;How do we enforce variance?&lt;/h2&gt;
+
+&lt;p&gt;There are three type of variance that can be enforce in Scala, provided &lt;a href=&quot;#concrete_type_hierarchy&quot;&gt;this hierarchy&lt;/a&gt;:&lt;/p&gt;
+
+&lt;p&gt;Reminder of the above concrete type hierary:&lt;/p&gt;
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// I have this hierarchy of types&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//             A&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//            ↗ ↖&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//           B   C&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+  &lt;tr&gt;
+    &lt;th&gt;&lt;b&gt;Variance&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Declaration&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Type constructor subtyping relationship&lt;/b&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;i&gt;Covariance&lt;/i&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;Container[+T]&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;
+      &lt;pre&gt;
+// I have this resulting hierarchy of type constructor
+//             Container[A]  Container[A]         
+//                 🠑             🠑    
+//             Container[B]  Container[C] 
+			 &lt;/pre&gt;
+		&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;i&gt;Invariance&lt;/i&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;Container[T]&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;
+      &lt;pre&gt;
+// Container[A], Container[B] and Container[C]
+// are completely unrelated types from the compiler 
+// point of view.
+			 &lt;/pre&gt;
+		&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;i&gt;Contravariance&lt;/i&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;Container[-T]&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;
+      &lt;pre&gt;
+// I have this resulting hierarchy of type constructor
+//             Container[B]  Container[C]         
+//                 🠑             🠑    
+//             Container[A]  Container[A] 
+			 &lt;/pre&gt;
+		&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Some important remarks:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Variance can be applied &lt;em&gt;only&lt;/em&gt; on immutable types.&lt;/li&gt;
+  &lt;li&gt;Variance is set &lt;em&gt;only&lt;/em&gt; at declaration of type constructors in Scala (it is called &lt;em&gt;declaration site variance&lt;/em&gt;).&lt;/li&gt;
+  &lt;li&gt;A single container may have multiple parameter types having different variance e.g &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZIO[-R, +E, +A]&lt;/code&gt;
+We say that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZIO&lt;/code&gt; is contravariant in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;R&lt;/code&gt; and covariant in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;E&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;A&lt;/code&gt;…and invariant in Nothing :)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;All this is really nice, but what the heck is it good for?
+Is there some implications on compilation, some contraints on types?
+How are designed types with respect to variance?&lt;/p&gt;
+
+&lt;h2 id=&quot;but-why-variance-after-all&quot;&gt;But why variance after all?&lt;/h2&gt;
+
+&lt;p&gt;We said it, enforcing variance is arbitrary. 
+In other word, you get to decide the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[+, (nothing here), -]&lt;/code&gt; 
+that is going to adorn you type constructor’s type parameters.&lt;/p&gt;
+
+&lt;p&gt;Once you commit to a specific variance for a specific type parameter you make a trade with the Scala compiler:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;You pay: “severe” restriction on the way you code your method on the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[T]&lt;/code&gt; (more on this later).&lt;/li&gt;
+  &lt;li&gt;You have: the &lt;em&gt;is a&lt;/em&gt; relationship of your container wrapping types is real and this allows to code methods 
+for a variety of types one time because it will be availale to all the subtype.&lt;/li&gt;
+  &lt;li&gt;You have: crazy good type inference!&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Let’s explain the second point.&lt;/p&gt;
+
+&lt;p&gt;By applying variance, you get a parameter passing experience that relates “correcly” 
+to the intuitiion, the feeling that it &lt;em&gt;should&lt;/em&gt; work!&lt;/p&gt;
+
+&lt;p&gt;For instance, given &lt;a href=&quot;#concrete_type_hierarchy&quot;&gt;our above &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;A/B/C&lt;/code&gt; hierarchy&lt;/a&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;List[+A]&lt;/code&gt; being covariant it is natural to think that 
+if a method take a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;List[A]&lt;/code&gt;, it should also accept a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;List[B]&lt;/code&gt; or a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;List[C]&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Why? This is interesting actually. In our mind, we know that the way to use a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;List&lt;/code&gt; is actually to get
+some elements out of it (i.e &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;List&lt;/code&gt; &lt;em&gt;produces&lt;/em&gt; elements for us) so we guess that any subtype of the list type
+should work because a subtype just increase the power (i.e have more methods, more fields for instance)
+of its supertype and therefore can be used in place of the supertype (this is called the Liskov Substitution Principle).&lt;/p&gt;
+
+&lt;p&gt;But hey, this is cool! 
+I know that wherever I need an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;A&lt;/code&gt; I can actually provide a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;B&lt;/code&gt; or a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;C&lt;/code&gt; and the above section
+showed me that a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;List[A]&lt;/code&gt; could be replaced by a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;List[B]&lt;/code&gt; or a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;List[C]&lt;/code&gt;! 
+So it goes in the same direction no? 
+Could we consider a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;List[B]&lt;/code&gt; a subtype of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;List[A]&lt;/code&gt;? Totally! This is called &lt;em&gt;covariance&lt;/em&gt;!&lt;/p&gt;
+
+&lt;p&gt;With our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[_]&lt;/code&gt; type:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// suppose Container has been declared invariant&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// A, B and C are concrete type according to the above hierarchy&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;???&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;c2&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;???&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;c3&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;???&lt;/span&gt; 
+
+&lt;span class=&quot;c1&quot;&gt;// a method taking a Container of the concrete type A&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;???&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// if Container is invariant in A like the declaration above &lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// this compile&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// this DOES NOT compile&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// this DOES NOT compile&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// now suppose Container has been declared covariant&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;+T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;nc&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// this compile&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// this compile&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// this compile&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Some important take away:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;We can code for multiple type in a secure (compiler controller) fashion with variance.&lt;/li&gt;
+  &lt;li&gt;&lt;em&gt;better type inference&lt;/em&gt; is not a caprice but actually a pretty handy feature!&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;what-do-we-owe-to-the-scala-compiler&quot;&gt;What do we owe to the Scala compiler?&lt;/h2&gt;
+
+&lt;p&gt;Now, we have understood the “What” and the “How” of variance and even a good bit of the “Why” 
+(we got an intuition about why a type could be logically covariant).&lt;/p&gt;
+
+&lt;p&gt;Still two important questions are pending:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;When a type constructor is designed (such as &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Array[T]&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Option[+A]&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Function1[-T1, +R]&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;List[+A]&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZIO[-R,+E,+A]&lt;/code&gt;…), 
+i.e how does the variance is decided for its type parameters?&lt;/li&gt;
+  &lt;li&gt;While coding the method of the container we may trigger “strange” 
+errors from the compiler telling us that a given type parameters occurs in “covariant” or “contravariant” position.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;What does it mean? What can we do about it?&lt;/p&gt;
+
+&lt;h3 id=&quot;the-producerconsumer-mental-model&quot;&gt;The Producer/Consumer mental model&lt;/h3&gt;
+
+&lt;p&gt;This part will attempt to explain the first of the above points.&lt;/p&gt;
+
+&lt;p&gt;Suppose we think about a data type i.e a new &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[T]&lt;/code&gt; (immutable with a single type parameter)
+that is going to have some interesting properties.&lt;/p&gt;
+
+&lt;p&gt;Now, we are asking ourselves: Is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container&lt;/code&gt; invariant, covariant or contravariant in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T&lt;/code&gt;?&lt;/p&gt;
+
+&lt;p&gt;To answer this question we have to imagine our data type in action. 
+So let’s suppose we have a function that take it as a parameter and will do something interesting with it:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doStuffWithContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Unit&lt;/span&gt; 
+&lt;span class=&quot;c1&quot;&gt;// or it could be&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doStuffWithContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt; 
+&lt;span class=&quot;c1&quot;&gt;// or also&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doStuffWithContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Unit&lt;/span&gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note: this is not really a function but a parametric function (“a function constructor”) whose type has to be fixed at compile time
+but we want to make it simple here so we’ll call it a function!&lt;/p&gt;
+
+&lt;p&gt;The implementation of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;doStuffWithContainer&lt;/code&gt; is going to interact with the container in ways that we could sum-up:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Receiving some &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T&lt;/code&gt; from it&lt;/li&gt;
+  &lt;li&gt;Passing some &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T&lt;/code&gt; to it&lt;/li&gt;
+  &lt;li&gt;Do both&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Other possibilities:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Do nothing with it but, but that is not very intersting nor it is well designed…&lt;/li&gt;
+  &lt;li&gt;Do something with the container that does not involve any &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T&lt;/code&gt;. This is actually interesting as it paves
+the way to some explanation about &lt;em&gt;path dependent type&lt;/em&gt; but let put it aside because it is not the subject.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Let’s see what happen with the above hypothese.&lt;/p&gt;
+
+&lt;h4 id=&quot;receiving-some-t-from-the-container&quot;&gt;Receiving some &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T&lt;/code&gt; from the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container&lt;/code&gt;&lt;/h4&gt;
+
+&lt;p&gt;This means that once we fix the type &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T&lt;/code&gt; (let’s say for the concrete type A &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;doStuffWithContainer[A]&lt;/code&gt;) 
+any instance of a subtype of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;A&lt;/code&gt; could also be received without problem by the implementation of the function. 
+This means in particular that: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;B&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;C&lt;/code&gt; would also work. In other words if:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// I have this hierarchy of types&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//             A&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//            ↗ ↖&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//           B   C&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;and…&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;doStuffWithContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]{})&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// work&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;doStuffWithContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]{})&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// would work also ideally!&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;doStuffWithContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]{})&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// would work also ideally!&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[T]&lt;/code&gt; is invariant in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[A]&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[B]&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[C]&lt;/code&gt; will be completely unrelated types
+from the compiler point of view (so the last 2 line of the above code will not work!).&lt;/p&gt;
+
+&lt;p&gt;But if &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[+T]&lt;/code&gt; is covariant in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T&lt;/code&gt; it will work without problem.&lt;/p&gt;
+
+&lt;p&gt;To sum-up:&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;If our function implementation is receiving some values of type &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T&lt;/code&gt; out of the container, covariance seems the way to go
+in order to accept not just &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[T]&lt;/code&gt; but &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container&lt;/code&gt; of all it subtype also! 
+In other word, when we need the type to be a &lt;em&gt;Producer&lt;/em&gt; of values we make it &lt;em&gt;Contravariant&lt;/em&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;passing-some-t-to-the-container&quot;&gt;Passing some &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T&lt;/code&gt; to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container&lt;/code&gt;&lt;/h4&gt;
+
+&lt;p&gt;This means that if we fix the type of the method to the concrete type, say &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;B&lt;/code&gt;, it will
+internally pass some &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;B&lt;/code&gt; to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container&lt;/code&gt;. If the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container&lt;/code&gt; is asking for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;B&lt;/code&gt;s or any supertype of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;B&lt;/code&gt;, the function will perform
+correctly. In particular: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;B&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;A&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Any&lt;/code&gt; would work. So, if:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// I have this hierarchy of types&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//            Any &lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//             🠕&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//             A&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//            ↗ ↖&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//           B   C&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;and…&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;???&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;doStuffWithContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]{})&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// work&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;doStuffWithContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]{})&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// would work also ideally!&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;doStuffWithContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Container&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Any&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]{})&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// would work also ideally!&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[T]&lt;/code&gt; is invariant in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[A]&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[B]&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[Any]&lt;/code&gt; will be completely unrelated types
+from the compiler point of view (so the last 2 line of the above code will not work!).&lt;/p&gt;
+
+&lt;p&gt;But if &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[-T]&lt;/code&gt; is contravariant in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T&lt;/code&gt; it will work without problem.&lt;/p&gt;
+
+&lt;p&gt;To sum-up:&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;If our function implementation is passing some values of type &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T&lt;/code&gt; to the container, contravariance seems the way to go
+in order to accept not just &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container[T]&lt;/code&gt; but &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Container&lt;/code&gt; of its supertypes also! 
+In other word, when we need the type to be a &lt;em&gt;Producer&lt;/em&gt; of values we make it &lt;em&gt;Contravariant&lt;/em&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;compilation-problems-relative-to-covariantcontravariant-position&quot;&gt;Compilation problems relative to covariant/contravariant position&lt;/h3&gt;
+
+&lt;h4 id=&quot;problem-with-covariant-container&quot;&gt;Problem with Covariant container&lt;/h4&gt;
+
+&lt;p&gt;Suppose the following code:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;A&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;C&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;sealed&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;CovContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;+T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;insider&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doStuff&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// this cannot compile!&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;object&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;CovContainer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;make&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;CovContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;CovContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;insider&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doStuff&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Here we are trying to create a &lt;em&gt;Producer&lt;/em&gt; type so we make it covariant according to what we discovered.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;doStuff(t: T): T&lt;/code&gt; function does not compile and we receive this message from the compiler:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;E&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;covariant&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;occurs&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;contravariant&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;position&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;of&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;t&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;E&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;L21&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt;     &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;doStuff&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;t:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;E&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;                       &lt;span class=&quot;o&quot;&gt;^^^^&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The compiler is trying to tell us that our code is not sound for the moment i.e it could lead to some contradictions.
+If we accept that our code are actually logical assertion, the compiler says that, had it compile the method
+reveiving &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;t:T&lt;/code&gt; in parameter, we could create un-sound assertion. And indeed we could:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;cci&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;CovContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;CovContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;make&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;555&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;cci&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;insider&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// would have return 555&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;cci&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;doStuff&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;111&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// would have return 666&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// let see what kind of contradiction we can tell the compiler to create&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// this work because the Container is declared contravariant&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;cca&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;CovContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Any&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cci&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// BOOOOM!!!! This will try to add Int to String&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;cca&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;doStuff&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Hi, I am sam&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We can fix the method this way:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doStuff&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;T1&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;&amp;gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T1&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This mean that if we are willing to pass a paramter (i.e be a &lt;em&gt;Consumer&lt;/em&gt; type) then the implementation need to be valid
+for any type &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T1&lt;/code&gt; that can be &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Int&lt;/code&gt; but also any other concrete supertype of it.
+This drastically reduce the possible implementations but at the same time it reveal the high price (with respect to soundness)
+of being both covariant with a contravariant method.&lt;/p&gt;
+
+&lt;h3 id=&quot;problems-with-contravariant-container&quot;&gt;Problems with Contravariant container&lt;/h3&gt;
+
+&lt;p&gt;In the same fashion on this code as a base:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  &lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;A&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;D&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ContraContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;-T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;passMe&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Unit&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doStuff&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;object&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ContraContainer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;make&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;ContraContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ContraContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bb&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;passMe&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Unit&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doStuff&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bb&lt;/span&gt;
+      &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We have this type of error on &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;def doStuff(t: T): T&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;E&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contravariant&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;occurs&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;covariant&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;position&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;t:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;of&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;method&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;doStuff&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;E&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;L54&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt;     &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;doStuff&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;t:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;E&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;                       &lt;span class=&quot;o&quot;&gt;^^^^&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And would it compile, we could create an unsound code that lead to a contradiction:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;cvc1&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;ContraContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;make&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{})&lt;/span&gt;
+  &lt;span class=&quot;nv&quot;&gt;cvc1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;passMe&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{})&lt;/span&gt;
+  &lt;span class=&quot;nv&quot;&gt;cvc1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;doStuff&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;B&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{})&lt;/span&gt;
+
+  &lt;span class=&quot;c1&quot;&gt;// this is possible because ContraContainer is contravariant&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;cvc2&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;ContraContainer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;D&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cvc1&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;// booooom! This call bar() on the runtime B type that does not have it&lt;/span&gt;
+  &lt;span class=&quot;nv&quot;&gt;cvc2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;doStuff&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;D&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{}).&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The method &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;doStuff&lt;/code&gt; has to be corrected as follows:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doStuff&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;T1&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;&amp;lt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;T1&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;the-example-of-zio&quot;&gt;The example of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZIO&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;The &lt;a href=&quot;https://zio.dev/&quot; title=&quot;ZIO Dev&quot;&gt;ZIO library&lt;/a&gt; provide numerous good example of the way to deal with variance (both co- and contra-).&lt;/p&gt;
+
+&lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZIO&lt;/code&gt; type as the following simplified signature:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;sealed&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ZIO&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;-R&lt;/span&gt;, &lt;span class=&quot;kt&quot;&gt;+E&lt;/span&gt;, &lt;span class=&quot;kt&quot;&gt;+A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;It is contravariant in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;R&lt;/code&gt; (the environment) and covariant in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;E&lt;/code&gt; the error type and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;A&lt;/code&gt; the success type.&lt;/p&gt;
+
+&lt;p&gt;In the light of what has been studied here, it can be understood as:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;A consumer type of an environment (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;R&lt;/code&gt;)&lt;/li&gt;
+  &lt;li&gt;A producer type of either an error &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;E&lt;/code&gt; either a succcess value &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;A&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Let’s take a method so see how the contravariant/covariant position error are avoided:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cm&quot;&gt;/**
+ * Returns an effect that executes both this effect and the specified effect, in parallel, returning result of provided effect.
+ */&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;R1&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;&amp;lt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;R&lt;/span&gt;, &lt;span class=&quot;kt&quot;&gt;E1&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;&amp;gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;E&lt;/span&gt;, &lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;](&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;that&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;ZIO&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;R1&lt;/span&gt;, &lt;span class=&quot;kt&quot;&gt;E1&lt;/span&gt;, &lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;ZIO&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;R1&lt;/span&gt;, &lt;span class=&quot;kt&quot;&gt;E1&lt;/span&gt;, &lt;span class=&quot;kt&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Reading this &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[R1 &amp;lt;: R, E1 &amp;gt;: E, B]&lt;/code&gt; we can now understand that:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;producing a ZIO value with a contravariant type, we need &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;R1 &amp;lt;: R&lt;/code&gt; to satisfy the compiler.&lt;/li&gt;
+  &lt;li&gt;consuming a ZIO value with an covariant type, we need  &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;E1 &amp;gt;: E&lt;/code&gt; to satify the compiler.&lt;/li&gt;
+  &lt;li&gt;the purpose of the method being to return the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;that&lt;/code&gt; effect we just need to return &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;B&lt;/code&gt; here.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Variance is a subtyping relationship between type constructors given a subtyping relationship between concrete types&lt;/li&gt;
+  &lt;li&gt;The subtyping relationship can follow the underlying types relationship (covariance), invert it (contravariance) or 
+forget the underlying relationship (invariance).&lt;/li&gt;
+  &lt;li&gt;Applying variance to a type parameter when declaring a type constructor is the responsibility of the creator of the type.&lt;/li&gt;
+  &lt;li&gt;The variance can be decided according to the role (Producer/Consumer/Both) of the type parameter in the type constructor&lt;/li&gt;
+  &lt;li&gt;Variance brings several advantage such as better type inference but also increase the range of type contructors that can be substituted
+securely without relying on explicit upcast&lt;/li&gt;
+  &lt;li&gt;Eventually, there is ways to deal with compiler constraint on “contravariant position” error when the type is covariant or “covariant position” error when the type is contravariant.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;{“mode”:”full”,”isActive”:false}&lt;/p&gt;</content><author><name>Samuel SAYAG</name><email>globattack@gmail.com</email></author><category term="scala" /><category term="variance" /><category term="subtyping" /><category term="type inference" /><category term="type" /><category term="inference" /><category term="ZIO" /><summary type="html">Variance Distilled</summary></entry><entry><title type="html">Bash Notes - Part 2</title><link href="htps://samuelsayag.github.io/bash/notes/2" rel="alternate" type="text/html" title="Bash Notes - Part 2" /><published>2021-02-02T00:00:00+02:00</published><updated>2021-02-02T00:00:00+02:00</updated><id>htps://samuelsayag.github.io/bash/notes/bash-notes-2</id><content type="html" xml:base="htps://samuelsayag.github.io/bash/notes/2">&lt;h1 id=&quot;bash-notes-part-2---transforming-the-input&quot;&gt;Bash Notes (Part 2) - Transforming the input&lt;/h1&gt;
 
 &lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
